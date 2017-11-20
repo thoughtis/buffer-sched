@@ -6,13 +6,16 @@ const parsers = require( './parsers' );
 const wp 			= require( './utils/wordpress' )
 const profiles = require( './private/profiles' );
 const sentry 	= require( './sentry' );
-
+const sleep = require( './utils/sleep' );
 
 /**
- * The Past Hour
+ * How far back to look for updates
+ * Usually 15 minutes
  */
-let since = process.env.since || Math.ceil( ( Date.now() / 1000 ) - ( 60 * 60 ) );
-console.log( 'Looking for updates since: ', since );
+const interval = 15 * 60 * 1000;
+
+// now - interval
+let since;
 
 /**
  * Use Sentry for Uncaught Exceptions
@@ -77,6 +80,8 @@ async function store_updates( updates ) {
 		try{
 
 			await pipe( get_post_from_update, update_wp_post_meta )( updates[i] );
+
+			await sleep( 50 );
 
 		} catch( err ) {
 
@@ -147,13 +152,17 @@ async function get_post_from_update( update ) {
 /**
  * Kick it off with self invoking async function
  */
-( async () => {
+async function start() {
+
+	since = Math.ceil( ( Date.now() - interval ) / 1000 );
 
 	for ( let i = 0; i < profiles.length; i++ ){
 
 		try{
 
 			await pipe( get_updates, store_updates )( profiles[i].buffer_id );
+
+			await sleep( 50 );
 
 		} catch( err ) {
 
@@ -163,4 +172,8 @@ async function get_post_from_update( update ) {
 
 	}
 
-})();
+};
+
+setInterval( start, interval );
+
+start();
