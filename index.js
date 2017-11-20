@@ -20,33 +20,6 @@ process.on( 'uncaughtException', ( err ) => {
 
 console.log( 'Looking for updates since: ', since );
 
-// ( async () => {
-
-// 	let response;
-// 	let options = {
-
-// 		headers: {
-// 			Authorization: 'Bearer ' + conf.buffer.auth_token
-// 		}
-
-// 	};
-
-// 	try{
-
-// 		response = await r2( 'https://api.bufferapp.com/1/profiles.json', options ).json;
-
-// 	} catch( err ) {
-
-// 		console.error( err );
-
-// 	}
-
-// 	const ids = response.map( p => p.id );
-
-// 	console.log( ids );
-
-// })();
-
 /**
  * Get Updates
  * @param string profile_id
