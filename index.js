@@ -64,7 +64,7 @@ async function get_updates( profile_id ) {
 
 	} catch( err ) {
 
-		console.error( err );
+		sentry.captureException(err);
 
 	}
 
@@ -87,7 +87,7 @@ async function store_updates( updates ) {
 
 		} catch( err ) {
 
-			console.error( err );
+			sentry.captureException(err);
 
 		}
 
@@ -119,7 +119,7 @@ async function update_wp_post_meta( update ) {
 
 	} catch( err ) {
 
-		console.error( err );
+		sentry.captureException(err);
 
 	}
 
@@ -159,7 +159,7 @@ async function get_post_from_update( update ) {
 
 		} catch( err ) {
 
-			console.error( err );
+			sentry.captureException(err);
 
 		}
 
