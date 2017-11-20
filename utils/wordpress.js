@@ -104,10 +104,6 @@ function share_already_recorded( shares, share_url ) {
 
 async function post( object ){
 
-	console.log( 'wp post called' );
-
-	return null;
-
 	let resp, post;
 
 	const options = {
