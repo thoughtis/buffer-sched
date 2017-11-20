@@ -8,8 +8,6 @@ const sentry = require( '../sentry' );
 const SITEID = '7369149';
 const API_BASE = `https://public-api.wordpress.com/rest/v1.1/sites/${SITEID}`;
 
-
-
 /**
  * Get
  * @param object update ( Buffer data with post_slug appended )
@@ -64,11 +62,7 @@ function parse( post ){
 
 		if ( true === share_already_recorded( shares, post.buffer.service_link ) ) {
 
-			sentry.captureException(
-				new Error( `${post.buffer.service_link} already recorded for ${post.slug}` )
-			);
-
-			return null;
+			throw new Error( `${post.buffer.service_link} already recorded for ${post.slug}` );
 
 		}
 
@@ -106,13 +100,6 @@ function share_already_recorded( shares, share_url ) {
 
 async function post( object ){
 
-	if ( null === object ) {
-		return;
-	}
-
-	// post_slug
-	// metadata
-
 	let post;
 
 	const options = {
@@ -135,7 +122,7 @@ async function post( object ){
 
 	}
 
-	console.log(post);
+//	console.log(post);
 
 }
 

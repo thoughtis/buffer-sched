@@ -18,9 +18,7 @@ module.exports = ( link ) => {
 	const post_slug = untrailingslashit( url_parts.pathname ).split( '/' ).pop();
 
 	if ( 'string' !== typeof post_slug ) {
-
 		throw new Error( `Unusable value for post slug: ${post_slug}` );
-
 	}
 
 	return post_slug;
