@@ -9,6 +9,15 @@ const sentry 	= require( './sentry' );
 
 let since = process.env.since || Math.ceil( ( Date.now() / 1000 ) - ( 60 * 60 ) );
 
+/**
+ * Use Sentry for Uncaught Exceptions
+ */
+process.on( 'uncaughtException', ( err ) => {
+
+    sentry.captureException( err );
+
+});
+
 console.log( 'Looking for updates since: ', since );
 
 // ( async () => {
