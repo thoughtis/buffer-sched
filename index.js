@@ -6,6 +6,10 @@ const parsers = require( './parsers' );
 const wp 			= require( './utils/wordpress' )
 const profiles = require( './private/profiles' );
 
+const sentry = require( 'raven' ); 
+
+sentry.config( conf.sentry.dsn ).install();
+
 let since = process.env.since || Math.ceil( ( Date.now() / 1000 ) - ( 60 * 60 ) );
 
 console.log( 'Looking for updates since: ', since );
