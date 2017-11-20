@@ -6,19 +6,13 @@ const twitter = require( 'twitter-text' );
 const url 		= require( 'url' );
 const r2 			= require( 'r2' );
 const redirect_follower = require( '../utils/redirect-follower' );
-const untrailingslashit = require( '../utils/untrailingslashit' );
+const find_post_slug = require( '../utils/find-post-slug' );
 
-/*
-
-{
-
-	"due_at",
-	"service_link",
-	"slug"
-
-}
-
-*/
+/**
+ * Main Function
+ * @param object update
+ * @return new object w/ post_slug added
+ */
 
 module.exports = async ( update ) => {
 
@@ -45,46 +39,32 @@ module.exports = async ( update ) => {
 
 	}
 
-	let post_url;
+	let link, post_slug;
 
 	// Figure out where that URL redirects
 		// if the request fails, or there's no header location, bail
 
 	try{
 
-		post_url = await redirect_follower( urls[0] );
+		link = await redirect_follower( urls[0] );
 
 	} catch( err ) {
-
 		throw err;
+	}
+
+	if ( 'string' !== typeof link ) {
+
+		throw new Error( `Unusable value for post url: ${link}` );
 
 	}
 
-	if ( 'string' !== typeof post_url ) {
+	// Find the Post Slug from the Link/URL
+	try{
 
-		throw new Error( `Unusable value for post url: ${post_url}` );
+		post_slug = find_post_slug( link );
 
-	}
-
-	// Parse the URL
-		// if its not on thoughtcatalog.com, bail but proceed
-
-	let url_parts = url.parse( post_url );
-
-	if ( 'thoughtcatalog.com' !== url_parts.hostname ) {
-		return null;
-	}
-
-
-	// Find the slug
-		// if we can't find it, bail
-
-	const post_slug = untrailingslashit( url_parts.pathname ).split( '/' ).pop();
-
-	if ( 'string' !== typeof post_slug ) {
-
-		throw new Error( `Unusable value for post slug: ${post_slug}` );
-
+	} catch( err ){
+		throw err;
 	}
 
 	return Object.assign( {}, update, { post_slug } );
