@@ -1,5 +1,5 @@
 const conf 		= require( './config/' );
-const r2 			= require( 'r2' );
+const request = require( 'request-promise-any' );
 const qs 			= require( 'query-string' );
 const pipe 		= require( './utils/pipe' );
 const parsers = require( './parsers' );
@@ -7,7 +7,12 @@ const wp 			= require( './utils/wordpress' )
 const profiles = require( './private/profiles' );
 const sentry 	= require( './sentry' );
 
+
+/**
+ * The Past Hour
+ */
 let since = process.env.since || Math.ceil( ( Date.now() / 1000 ) - ( 60 * 60 ) );
+console.log( 'Looking for updates since: ', since );
 
 /**
  * Use Sentry for Uncaught Exceptions
@@ -17,8 +22,6 @@ process.on( 'uncaughtException', ( err ) => {
     sentry.captureException( err );
 
 });
-
-console.log( 'Looking for updates since: ', since );
 
 /**
  * Get Updates
@@ -31,19 +34,26 @@ async function get_updates( profile_id ) {
 
 	const options = {
 
+		method: 'GET',
 		headers: {
 			Authorization: 'Bearer ' + conf.buffer.auth_token
-		}
+		},
+		url: `https://api.bufferapp.com/1/profiles/${profile_id}/updates/sent.json?since=${since}`
 
 	};
 
 	try{
 
-		response = await r2( `https://api.bufferapp.com/1/profiles/${profile_id}/updates/sent.json?since=${since}`, options ).json;
+		response = await request( options );
+
+		response = JSON.parse( response );
 
 	} catch( err ) {
 
 		sentry.captureException(err);
+
+		// return null so next function in pipe knows to bail
+		return null;
 
 	}
 
@@ -58,6 +68,10 @@ async function get_updates( profile_id ) {
  */
 async function store_updates( updates ) {
 
+	if ( null === updates ) {
+		return;
+	}
+
 	for ( let i = 0; i < updates.length; i++ ) {
 
 		try{
@@ -66,13 +80,12 @@ async function store_updates( updates ) {
 
 		} catch( err ) {
 
+			// Capture exception, and continue
 			sentry.captureException(err);
 
 		}
 
 	}
-
-	return null;
 
 }
 
@@ -82,11 +95,6 @@ async function store_updates( updates ) {
  * @return object update
  */
 async function update_wp_post_meta( update ) {
-
-	console.log( update );
-
-	// testing
-	return;
 
 	if ( null === update ) {
 		return;
@@ -98,12 +106,10 @@ async function update_wp_post_meta( update ) {
 
 	} catch( err ) {
 
-		sentry.captureException(err);
+		// throw this up to the parent
+		throw err;
 
 	}
-
-	// maybe don't need to return? we're done now
-	// return update;
 
 }
 
@@ -121,7 +127,20 @@ async function get_post_from_update( update ) {
 
 	}
 
-	return await parsers[update.profile_service]( update );
+	try{
+
+		update = await parsers[update.profile_service]( update );
+
+	} catch( err ) {
+
+		sentry.captureException(err);
+
+		// return null so next function in pipe knows to bail
+		return null;
+
+	}
+
+	return update;
 
 }
 

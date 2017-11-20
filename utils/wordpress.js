@@ -2,13 +2,11 @@
  * WP
  */
 const conf 	= require( '../config' );
-const r2 	= require( 'r2' );
 const sentry = require( '../sentry' );
+const request = require( 'request-promise-any' );
 
 const SITEID = '7369149';
 const API_BASE = `https://public-api.wordpress.com/rest/v1.1/sites/${SITEID}`;
-
-
 
 /**
  * Get
@@ -17,17 +15,21 @@ const API_BASE = `https://public-api.wordpress.com/rest/v1.1/sites/${SITEID}`;
  */
 async function get( update ){
 
-	let post;
+	let resp, post;
 
 	const options = {
+		method: 'GET',
 		headers:{
 			'Authorization' : `Bearer ${conf.wp.auth_token}`
-		}
+		},
+		url: `${API_BASE}/posts/slug:${update.post_slug}`
 	};
 
 	try{
 
-		post = await r2( `${API_BASE}/posts/slug:${update.post_slug}`, options ).json;
+		resp = await request( options )
+
+		post = JSON.parse( resp );
 
 	} catch( err ) {
 
@@ -64,15 +66,10 @@ function parse( post ){
 
 		if ( true === share_already_recorded( shares, post.buffer.service_link ) ) {
 
-			sentry.captureException(
-				new Error( `${post.buffer.service_link} already recorded for ${post.slug}` )
-			);
-
-			return null;
+			throw new Error( `${post.buffer.service_link} already recorded for ${post.slug}` );
 
 		}
 
-		// update
 		shares[0].operation = 'update';
 		shares[0].value.push( [ post.buffer.service_link, post.buffer.due_at ] )
 
@@ -96,7 +93,7 @@ function share_already_recorded( shares, share_url ) {
 
 	const test = shares[0].value.filter( ( sv ) => {
 
-		return post.buffer.service_link === sv[0];
+		return share_url === sv[0];
 
 	});
 
@@ -106,16 +103,11 @@ function share_already_recorded( shares, share_url ) {
 
 async function post( object ){
 
-	if ( null === object ) {
-		return;
-	}
-
-	// post_slug
-	// metadata
-
-	let post;
+	let resp, post;
 
 	const options = {
+		method: 'POST',
+		url: `${API_BASE}/posts/${object.post_id}`,
 		headers:{
 			'Authorization' : `Bearer ${conf.wp.auth_token}`,
 			'Content-Type' : 'application/json'
@@ -127,7 +119,9 @@ async function post( object ){
 
 	try{
 
-		post = await r2.post( `${API_BASE}/posts/${object.post_id}`, options ).json;
+		resp = await request( options );
+
+		post = JSON.parse( resp );
 
 	} catch( err ) {
 
@@ -135,7 +129,7 @@ async function post( object ){
 
 	}
 
-	console.log(post);
+	console.log( `${post} returned successfully from WP API.` );
 
 }
 

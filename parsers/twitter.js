@@ -33,10 +33,7 @@ module.exports = async ( update ) => {
 		new url.URL( urls[0] );
 
 	} catch( err ) {
-
-		console.error( err );
-		return null;
-
+		throw err;
 	}
 
 	let link, post_slug;
