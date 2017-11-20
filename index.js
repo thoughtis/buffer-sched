@@ -45,6 +45,9 @@ async function get_updates( profile_id ) {
 
 		sentry.captureException(err);
 
+		// return null so next function in pipe knows to bail
+		return null;
+
 	}
 
 	return response.updates;
@@ -58,6 +61,10 @@ async function get_updates( profile_id ) {
  */
 async function store_updates( updates ) {
 
+	if ( null === updates ) {
+		return;
+	}
+
 	for ( let i = 0; i < updates.length; i++ ) {
 
 		try{
@@ -66,13 +73,12 @@ async function store_updates( updates ) {
 
 		} catch( err ) {
 
+			// Capture exception, and continue
 			sentry.captureException(err);
 
 		}
 
 	}
-
-	return null;
 
 }
 
@@ -82,11 +88,6 @@ async function store_updates( updates ) {
  * @return object update
  */
 async function update_wp_post_meta( update ) {
-
-	console.log( update );
-
-	// testing
-	return;
 
 	if ( null === update ) {
 		return;
@@ -98,12 +99,10 @@ async function update_wp_post_meta( update ) {
 
 	} catch( err ) {
 
-		sentry.captureException(err);
+		// throw this up to the parent
+		throw err;
 
 	}
-
-	// maybe don't need to return? we're done now
-	// return update;
 
 }
 
@@ -121,7 +120,20 @@ async function get_post_from_update( update ) {
 
 	}
 
-	return await parsers[update.profile_service]( update );
+	try{
+
+		update = await parsers[update.profile_service]( update );
+
+	} catch( err ) {
+
+		sentry.captureException(err);
+
+		// return null so next function in pipe knows to bail
+		return null;
+
+	}
+
+	return update;
 
 }
 
