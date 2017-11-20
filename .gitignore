@@ -1,3 +1,9 @@
+.DS_Store
+/config/*
+!/config/index.js
+!/config/common.js
+/private
+
 # Logs
 logs
 *.log
@@ -56,4 +62,3 @@ typings/
 
 # dotenv environment variables file
 .env
-
