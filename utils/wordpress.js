@@ -2,7 +2,6 @@
  * WP
  */
 const conf 	= require( '../config' );
-const r2 	= require( 'r2' );
 const sentry = require( '../sentry' );
 const request = require( 'request-promise-any' );
 
