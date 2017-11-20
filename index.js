@@ -5,10 +5,7 @@ const pipe 		= require( './utils/pipe' );
 const parsers = require( './parsers' );
 const wp 			= require( './utils/wordpress' )
 const profiles = require( './private/profiles' );
-
-const sentry = require( 'raven' ); 
-
-sentry.config( conf.sentry.dsn ).install();
+const sentry 	= require( './sentry' );
 
 let since = process.env.since || Math.ceil( ( Date.now() / 1000 ) - ( 60 * 60 ) );
 
