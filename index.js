@@ -6,6 +6,10 @@ const parsers = require( './parsers' );
 const wp 			= require( './utils/wordpress' )
 const profiles = require( './private/profiles' );
 
+const sentry = require( 'raven' ); 
+
+sentry.config( conf.sentry.dsn ).install();
+
 let since = process.env.since || Math.ceil( ( Date.now() / 1000 ) - ( 60 * 60 ) );
 
 console.log( 'Looking for updates since: ', since );
@@ -60,7 +64,7 @@ async function get_updates( profile_id ) {
 
 	} catch( err ) {
 
-		console.error( err );
+		sentry.captureException(err);
 
 	}
 
@@ -83,7 +87,7 @@ async function store_updates( updates ) {
 
 		} catch( err ) {
 
-			console.error( err );
+			sentry.captureException(err);
 
 		}
 
@@ -115,7 +119,7 @@ async function update_wp_post_meta( update ) {
 
 	} catch( err ) {
 
-		console.error( err );
+		sentry.captureException(err);
 
 	}
 
@@ -155,7 +159,7 @@ async function get_post_from_update( update ) {
 
 		} catch( err ) {
 
-			console.error( err );
+			sentry.captureException(err);
 
 		}
 
