@@ -1,5 +1,5 @@
 const conf 		= require( './config/' );
-const r2 			= require( 'r2' );
+const request = require( 'request-promise-any' );
 const qs 			= require( 'query-string' );
 const pipe 		= require( './utils/pipe' );
 const parsers = require( './parsers' );
@@ -7,7 +7,12 @@ const wp 			= require( './utils/wordpress' )
 const profiles = require( './private/profiles' );
 const sentry 	= require( './sentry' );
 
+
+/**
+ * The Past Hour
+ */
 let since = process.env.since || Math.ceil( ( Date.now() / 1000 ) - ( 60 * 60 ) );
+console.log( 'Looking for updates since: ', since );
 
 /**
  * Use Sentry for Uncaught Exceptions
@@ -17,8 +22,6 @@ process.on( 'uncaughtException', ( err ) => {
     sentry.captureException( err );
 
 });
-
-console.log( 'Looking for updates since: ', since );
 
 /**
  * Get Updates
@@ -31,15 +34,19 @@ async function get_updates( profile_id ) {
 
 	const options = {
 
+		method: 'GET',
 		headers: {
 			Authorization: 'Bearer ' + conf.buffer.auth_token
-		}
+		},
+		url: `https://api.bufferapp.com/1/profiles/${profile_id}/updates/sent.json?since=${since}`
 
 	};
 
 	try{
 
-		response = await r2( `https://api.bufferapp.com/1/profiles/${profile_id}/updates/sent.json?since=${since}`, options ).json;
+		response = await request( options );
+
+		response = JSON.parse( response );
 
 	} catch( err ) {
 

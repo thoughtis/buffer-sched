@@ -7,6 +7,7 @@ const r2 	= require( 'r2' );
 const redirect_follower = require( '../utils/redirect-follower' );
 const find_post_slug = require( '../utils/find-post-slug' );
 const profiles = require( '../private/profiles' );
+const pipe = require( '../utils/pipe' );
 
 /**
  * URL in Update.Media
@@ -129,7 +130,7 @@ function use_property_name_in_url( update ){
 
 	}
 
-	return 'https://business.facebook.com' + path_parts.join('/');
+	return 'https://business.facebook.com' + path.join('/');
 
 }
 
@@ -172,7 +173,7 @@ module.exports = async ( update ) => {
 	}
 
 	// Modify the service link
-	update.service_link = use_property_name_in_url( update.service_link )
+	update.service_link = use_property_name_in_url( update )
 
 	return Object.assign( {}, update, { post_slug } );
 
