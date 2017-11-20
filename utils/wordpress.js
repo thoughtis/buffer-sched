@@ -3,6 +3,7 @@
  */
 const conf 	= require( '../config' );
 const r2 	= require( 'r2' );
+const sentry = require( '../sentry' );
 
 const SITEID = '7369149';
 const API_BASE = `https://public-api.wordpress.com/rest/v1.1/sites/${SITEID}`;
@@ -61,6 +62,16 @@ function parse( post ){
 
 	} else {
 
+		if ( true === share_already_recorded( shares, post.buffer.service_link ) ) {
+
+			sentry.captureException(
+				new Error( `${post.buffer.service_link} already recorded for ${post.slug}` )
+			);
+
+			return null;
+
+		}
+
 		// update
 		shares[0].operation = 'update';
 		shares[0].value.push( [ post.buffer.service_link, post.buffer.due_at ] )
@@ -71,6 +82,25 @@ function parse( post ){
 		post_id : post.ID,
 		metadata : shares
 	};
+
+}
+
+/**
+ * Share Already Recorded
+ * Determine if the share URL already exists in the shares array
+ * @param array shares
+ * @param string share_url
+ * @return boolean
+ */
+function share_already_recorded( shares, share_url ) {
+
+	const test = shares[0].value.filter( ( sv ) => {
+
+		return post.buffer.service_link === sv[0];
+
+	});
+
+	return ( 0 !== test.length );
 
 }
 
