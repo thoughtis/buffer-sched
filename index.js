@@ -60,6 +60,8 @@ async function get_updates( profile_id ) {
 
 	}
 
+	console.log( `Got ${response.updates.length} updates for ${profile_id}` );
+
 	return response.updates;
 
 }
@@ -153,6 +155,8 @@ async function get_post_from_update( update ) {
  * Kick it off with self invoking async function
  */
 async function start() {
+
+	console.log( 'Running ', ( Date.now() / 1000 ) ); 
 
 	since = Math.ceil( ( Date.now() - interval ) / 1000 );
 

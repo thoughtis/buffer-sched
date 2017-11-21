@@ -15,6 +15,8 @@ const API_BASE = `https://public-api.wordpress.com/rest/v1.1/sites/${SITEID}`;
  */
 async function get( update ){
 
+	console.log( 'Get Post: ', update.post_slug );
+
 	let resp, post;
 
 	const options = {
@@ -48,6 +50,8 @@ async function get( update ){
  */
 
 function parse( post ){
+
+	console.log( 'Parse Share: ', post.buffer.service_link );
 
 	// metadata is array of objects, one if them will have the key tc_team_social_shares
 
@@ -102,6 +106,8 @@ function share_already_recorded( shares, share_url ) {
 }
 
 async function post( object ){
+
+	console.log( 'Store Post: ', object.post_id );
 
 	let resp, post;
 
