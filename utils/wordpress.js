@@ -129,7 +129,7 @@ async function post( object ){
 
 	}
 
-	console.log( `${post} returned successfully from WP API.` );
+	console.log( `${post.ID} returned successfully from WP API.` );
 
 }
 
