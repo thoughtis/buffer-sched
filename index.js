@@ -81,7 +81,7 @@ async function store_updates( updates ) {
 
 		try{
 
-			await pipe( get_post_from_update, update_wp_post_meta )( updates[i] );
+			await pipe( get_post_from_update, find_update_time, update_wp_post_meta )( updates[i] );
 
 			await sleep( 50 );
 
@@ -93,6 +93,31 @@ async function store_updates( updates ) {
 		}
 
 	}
+
+}
+
+/**
+ * Find Update Time
+ * Ensure that each update as a value for 'due_at'
+ * Make it the same as 'sent_at' if the initial value is 0
+ * @param object
+ * @return object
+ */
+function find_update_time( update ) {
+
+	if ( ! ('due_at' in update) && ! ('sent_at' in update) ) {
+
+		throw new Error( 'Update contains no time information' )
+
+	}
+
+	if ( ! ('due_at' in update) || 0 === update.due_at ) {
+
+		update.due_at = update.sent_at;
+
+	}
+
+	return update;
 
 }
 
