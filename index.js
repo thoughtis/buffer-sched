@@ -10,9 +10,9 @@ const sleep = require( './utils/sleep' );
 
 /**
  * How far back to look for updates
- * Usually 15 minutes
+ * Usually 10 minutes
  */
-const interval = 15 * 60 * 1000;
+const interval = 10 * 60 * 1000;
 
 // now - interval
 let since;
