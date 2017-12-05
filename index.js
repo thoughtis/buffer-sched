@@ -105,6 +105,10 @@ async function store_updates( updates ) {
  */
 function find_update_time( update ) {
 
+	if ( null === update || 'object' !== typeof update ) {
+		return update;
+	}
+
 	if ( ! ('due_at' in update) && ! ('sent_at' in update) ) {
 
 		throw new Error( 'Update contains no time information' )
