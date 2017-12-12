@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "NODE_ENV=production pm2 start index.js",
-    "start:dev": "NODE_ENV=development pm2 start index.js"
+    "start:dev": "NODE_ENV=development node index.js"
   },
   "author": "Thought & Expression Co. <devjobs@thought.is>",
   "license": "ISC",
