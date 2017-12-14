@@ -187,7 +187,7 @@ async function start() {
 
 	console.log( 'Running ', ( Date.now() / 1000 ) ); 
 
-	since = Math.ceil( ( Date.now() - interval ) / 1000 );
+	since = Math.ceil( ( Date.now() - ( interval * 2 ) ) / 1000 );
 
 	for ( let i = 0; i < profiles.length; i++ ){
 
