@@ -8,6 +8,7 @@ const redirect_follower = require( '../utils/redirect-follower' );
 const find_post_slug = require( '../utils/find-post-slug' );
 const profiles = require( '../private/profiles' );
 const pipe = require( '../utils/pipe' );
+const twitter = require( 'twitter-text' );
 
 /**
  * URL in Update.Media
@@ -144,15 +145,28 @@ function use_property_name_in_url( update ){
 
 module.exports = async ( update ) => {
 
-	// Ensure we have a link to work with
-	if ( true !== url_in_update_media( update ) ) {
+	let link = null;
+	let post_slug;
 
-		throw new Error( `No URLs found in Facebook update: ${update.id}` );
+	// Ensure we have a link to work with
+	if ( true === url_in_update_media( update ) ) {
+
+		link = 'expanded_link' in update.media ? update.media.expanded_link : update.media.link;
+
+	} else {
+
+		const text = 'text' in update ? update.text : '',
+					urls = twitter.extractUrls( update.text );
+
+		if ( 0 < urls.length ) {
+			link = urls[0];
+		}
 
 	}
 
-  let link = 'expanded_link' in update.media ? update.media.expanded_link : update.media.link;
-  let post_slug;
+	if ( null === link ) {
+		throw new Error( `No URLs found in Facebook update: ${update.id}` );
+	}
 
   // Validate the link and follow and redirects we might find
   try{
