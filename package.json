@@ -1,0 +1,21 @@
+{
+  "name": "buffer-sched",
+  "version": "1.0.0",
+  "description": "Mirror data from Buffer to WP via API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "NODE_ENV=production pm2 start index.js",
+    "start:dev": "NODE_ENV=development node index.js"
+  },
+  "author": "Thought & Expression Co. <devjobs@thought.is>",
+  "license": "ISC",
+  "dependencies": {
+    "query-string": "^5.0.1",
+    "r2": "^2.0.0",
+    "raven": "^2.2.1",
+    "request": "^2.83.0",
+    "request-promise-any": "^1.0.5",
+    "twitter-text": "^1.14.7"
+  }
+}
